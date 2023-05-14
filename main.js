@@ -1,5 +1,6 @@
 import venom from "venom-bot";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
@@ -32,26 +33,23 @@ function start(client) {
       }
 
       const params = {
-        prompt: message || "Olá!",
-        temperature: 0.5,
-        max_tokens: 50,
+        prompt: message.content || "",
         model: MODEL_ID,
       };
 
       console.log("EXECUTANDO GPT");
-      console.log(`params: ${params}`, `key: ${process.env.OPENAI_KEY}`)
 
       axios
         .post("https://api.openai.com/v1/completions", params, {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: OPENAI_KEY,
+            'Content-Type': 'application/json',
+            Authorization: `${OPENAI_KEY}`,
           },
         })
         .then((response) => {
-          let text = response.data.choices[0].text;
+          console.log("real response", response.data.choices[0].text);
           client
-            .sendText(message.from, text)
+            .sendText(message.from, response.data.choices[0].text || "response")
             .then((result) => {})
             .catch((error) => {
               console.error("Error when sending: ", error);
