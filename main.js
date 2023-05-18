@@ -5,7 +5,6 @@ import axios from "axios";
 dotenv.config();
 
 const OPENAI_KEY = "Bearer " + process.env.OPENAI_KEY;
-const MODEL_ID = process.env.MODEL_ID;
 
 venom
   .create({
@@ -33,8 +32,13 @@ function start(client) {
       }
 
       const params = {
-        prompt: message.content || "",
-        model: MODEL_ID,
+        model: "gpt-3.5-turbo-0301",
+        messages: [
+          {
+            role: "user",
+            content: message.content || "",
+          },
+        ],
       };
 
       console.log("EXECUTANDO GPT");
@@ -42,14 +46,17 @@ function start(client) {
       axios
         .post("https://api.openai.com/v1/completions", params, {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `${OPENAI_KEY}`,
           },
         })
         .then((response) => {
-          console.log("real response", response.data.choices[0].text);
           client
-            .sendText(message.from, response.data.choices[0].text || "response")
+            .sendText(
+              message.from,
+              `*ZapGPT*\n\n${response.data.choices[0].message.content}` ||
+                "response"
+            )
             .then((result) => {})
             .catch((error) => {
               console.error("Error when sending: ", error);
@@ -59,16 +66,6 @@ function start(client) {
         .catch((error) => {
           console.error(error);
         });
-
-      //   client
-      //     .sendText(
-      //       message.from,
-      //       `${message.notifyName}, sou um algoritmo, Júlio está trabalhando em mim nesse exato momento. Mande mensagem outra hora, obrigado!`
-      //     )
-      //     .then((result) => {})
-      //     .catch((error) => {
-      //       console.error("Error when sending: ", error);
-      //     });
     }
   });
 }
