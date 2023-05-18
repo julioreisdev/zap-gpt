@@ -44,7 +44,7 @@ function start(client) {
       console.log("EXECUTANDO GPT");
 
       axios
-        .post("https://api.openai.com/v1/completions", params, {
+        .post("https://api.openai.com/v1/chat/completions", params, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `${OPENAI_KEY}`,
